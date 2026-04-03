@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="description" content="Python OOP Mastery — Beginner to Advanced">
+<title>PyOOP — Python OOP Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- PWA Manifest inline -->
+<script>
+const manifestData = {
+  name: "PyOOP — Python OOP Mastery",
+  short_name: "PyOOP",
+  description: "Python Object-Oriented Programming — Beginner to Advanced",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#0a0a0f",
+  theme_color: "#7c6cf0",
+  icons: [{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c6cf0'/><text y='.9em' font-size='70' x='15' fill='white' font-family='monospace' font-weight='bold'>Py</text></svg>",sizes:"512x512",type:"image/svg+xml"}]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
+const manifestURL = URL.createObjectURL(blob);
+document.write('<link rel="manifest" href="' + manifestURL + '">');
+</script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--bg2:#111118;--bg3:#16161f;--bg4:#1c1c28;
+  --border:#ffffff12;--border2:#ffffff20;
+  --text:#e8e8f0;--text2:#9090a8;--text3:#60607a;
+  --accent:#7c6cf0;--accent2:#a599f7;--accent3:#5b4fd4;
+  --green:#3ecf8e;--amber:#f59e0b;--red:#f43f5e;--blue:#38bdf8;
+  --font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:10px;--r2:16px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+#app{display:flex;height:100vh;width:100%;overflow:hidden}
+
+/* SIDEBAR */
+#sidebar{
+  width:260px;min-width:260px;height:100vh;background:var(--bg2);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  overflow:hidden;transition:width .25s ease,min-width .25s ease;
+}
+#sidebar.collapsed{width:56px;min-width:56px}
+#sidebar-header{
+  padding:16px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+#logo{
+  width:32px;height:32px;border-radius:8px;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-weight:700;font-size:13px;color:#fff;letter-spacing:-0.5px;
+}
+#logo-text{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;
+  background:linear-gradient(135deg,#a599f7,#7c6cf0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#toggle-btn{
+  margin-left:auto;background:none;border:none;cursor:pointer;
+  color:var(--text2);padding:4px;border-radius:6px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+#toggle-btn:hover{background:var(--bg3);color:var(--text)}
+
+#progress-bar-wrap{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+#progress-label{font-size:11px;color:var(--text2);margin-bottom:6px;display:flex;justify-content:space-between;white-space:nowrap;overflow:hidden}
+#progress-track{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+#progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease}
+
+#chapter-list{flex:1;overflow-y:auto;padding:8px}
+#chapter-list::-webkit-scrollbar{width:4px}
+#chapter-list::-webkit-scrollbar-track{background:transparent}
+#chapter-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.section-label{
+  font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.08em;
+  padding:10px 8px 4px;text-transform:uppercase;white-space:nowrap;overflow:hidden;
+}
+.ch-item{
+  display:flex;align-items:center;gap:10px;padding:8px 10px;
+  border-radius:var(--r);cursor:pointer;transition:background .15s;
+  position:relative;white-space:nowrap;overflow:hidden;
+  border:1px solid transparent;margin-bottom:1px;
+}
+.ch-item:hover{background:var(--bg3)}
+.ch-item.active{background:var(--bg4);border-color:var(--border2)}
+.ch-item.active .ch-title{color:var(--accent2)}
+.ch-num{
+  width:22px;height:22px;border-radius:6px;background:var(--bg4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;color:var(--text2);flex-shrink:0;font-family:var(--mono);
+}
+.ch-item.done .ch-num{background:#3ecf8e22;color:var(--green)}
+.ch-item.active .ch-num{background:var(--accent);color:#fff}
+.ch-title{font-size:13px;color:var(--text2);font-weight:500;overflow:hidden;text-overflow:ellipsis}
+.ch-check{margin-left:auto;flex-shrink:0}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#topbar{
+  padding:0 20px;height:54px;display:flex;align-items:center;
+  gap:12px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;
+}
+#ch-breadcrumb{font-size:12px;color:var(--text3)}
+#ch-breadcrumb span{color:var(--text2)}
+.tab-btns{display:flex;gap:4px;margin-left:auto}
+.tab-btn{
+  padding:5px 14px;border-radius:20px;border:1px solid transparent;
+  background:transparent;color:var(--text2);cursor:pointer;font-size:12px;
+  font-family:var(--font);font-weight:500;transition:all .15s;
+}
+.tab-btn:hover{background:var(--bg3);color:var(--text)}
+.tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+#mark-done-btn{
+  padding:5px 14px;border-radius:20px;border:1px solid var(--green);
+  background:transparent;color:var(--green);cursor:pointer;font-size:12px;
+  font-family:var(--font);font-weight:500;transition:all .15s;
+}
+#mark-done-btn:hover{background:#3ecf8e18}
+#mark-done-btn.done-state{background:#3ecf8e22;color:var(--green)}
+
+#content{flex:1;overflow-y:auto;padding:28px 32px}
+#content::-webkit-scrollbar{width:5px}
+#content::-webkit-scrollbar-track{background:transparent}
+#content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* LESSON TAB */
+.ch-header{margin-bottom:24px}
+.ch-header h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.ch-header p{font-size:14px;color:var(--text2);line-height:1.7}
+.tag-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.tag{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid}
+.tag.beginner{background:#3ecf8e12;color:var(--green);border-color:#3ecf8e30}
+.tag.intermediate{background:#f59e0b12;color:var(--amber);border-color:#f59e0b30}
+.tag.advanced{background:#f43f5e12;color:var(--red);border-color:#f43f5e30}
+
+.concept-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.concept-card{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);
+  padding:16px;
+}
+.concept-card h3{font-size:13px;font-weight:600;margin-bottom:6px;color:var(--accent2)}
+.concept-card p{font-size:12px;color:var(--text2);line-height:1.6}
+
+.section-title{font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+
+.code-block{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);
+  padding:20px;margin-bottom:20px;position:relative;overflow-x:auto;
+}
+.code-block pre{font-family:var(--mono);font-size:12.5px;color:#c8d3f5;line-height:1.8;white-space:pre}
+.code-label{
+  position:absolute;top:12px;right:12px;font-size:10px;font-weight:600;
+  color:var(--text3);font-family:var(--mono);background:var(--bg4);
+  padding:2px 8px;border-radius:4px;
+}
+.copy-btn{
+  position:absolute;bottom:10px;right:10px;padding:4px 10px;
+  background:var(--bg4);border:1px solid var(--border2);border-radius:6px;
+  color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);
+  transition:all .15s;
+}
+.copy-btn:hover{background:var(--border2);color:var(--text)}
+
+/* AI PANEL */
+#ai-btn{
+  position:fixed;bottom:20px;right:20px;
+  width:44px;height:44px;border-radius:50%;
+  background:var(--accent);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px #7c6cf050;transition:transform .2s;z-index:100;
+}
+#ai-btn:hover{transform:scale(1.08)}
+#ai-panel{
+  position:fixed;bottom:72px;right:20px;width:340px;
+  background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);
+  display:none;flex-direction:column;overflow:hidden;z-index:99;
+  max-height:420px;
+}
+#ai-panel.open{display:flex}
+#ai-panel-header{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;background:var(--bg4);
+}
+#ai-panel-header span{font-size:13px;font-weight:600}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+#ai-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.ai-msg{font-size:12.5px;line-height:1.6;padding:10px 12px;border-radius:10px}
+.ai-msg.bot{background:var(--bg4);color:var(--text);max-width:90%}
+.ai-msg.user{background:var(--accent);color:#fff;align-self:flex-end;max-width:85%}
+#ai-input-row{padding:10px;border-top:1px solid var(--border);display:flex;gap:6px}
+#ai-input{
+  flex:1;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;
+  padding:7px 10px;color:var(--text);font-family:var(--font);font-size:12px;
+  outline:none;
+}
+#ai-input:focus{border-color:var(--accent)}
+#ai-send{
+  padding:6px 12px;background:var(--accent);border:none;border-radius:8px;
+  color:#fff;font-family:var(--font);font-size:12px;cursor:pointer;font-weight:600;
+}
+
+/* QUIZ TAB */
+.quiz-wrap{max-width:640px}
+.quiz-q{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);
+  padding:20px;margin-bottom:16px;
+}
+.quiz-q h3{font-size:14px;font-weight:600;margin-bottom:14px;line-height:1.5}
+.quiz-opt{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-radius:var(--r);border:1px solid var(--border2);cursor:pointer;
+  margin-bottom:8px;transition:all .15s;font-size:13px;color:var(--text2);
+}
+.quiz-opt:hover{background:var(--bg4);border-color:var(--accent);color:var(--text)}
+.quiz-opt.correct{background:#3ecf8e12;border-color:var(--green);color:var(--green)}
+.quiz-opt.wrong{background:#f43f5e12;border-color:var(--red);color:var(--red)}
+.quiz-opt.selected{background:var(--bg4);border-color:var(--accent2);color:var(--accent2)}
+.opt-letter{
+  width:22px;height:22px;border-radius:6px;background:var(--bg4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;font-family:var(--mono);
+}
+.quiz-feedback{
+  padding:10px 14px;border-radius:var(--r);font-size:12.5px;margin-top:8px;
+  display:none;line-height:1.6;
+}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#3ecf8e12;border:1px solid #3ecf8e30;color:var(--green)}
+.quiz-feedback.bad{background:#f43f5e12;border:1px solid #f43f5e30;color:#f87092}
+.quiz-score{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);
+  padding:24px;text-align:center;display:none;
+}
+.quiz-score h2{font-size:22px;font-weight:700;margin-bottom:8px}
+.quiz-score p{color:var(--text2);font-size:14px;margin-bottom:16px}
+.btn-primary{
+  padding:9px 20px;background:var(--accent);border:none;border-radius:var(--r);
+  color:#fff;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;
+  transition:background .15s;
+}
+.btn-primary:hover{background:var(--accent3)}
+
+/* Syntax colors */
+.kw{color:#bb9af7}.str{color:#9ece6a}.cm{color:#565f89;font-style:italic}
+.fn{color:#7aa2f7}.cl{color:#ff9e64}.num{color:#ff9e64}.punc{color:#89ddff}
+
+/* Mobile responsive */
+@media(max-width:640px){
+  #sidebar{width:200px;min-width:200px}
+  #sidebar.collapsed{width:0;min-width:0;border:none}
+  #content{padding:16px}
+  #ch-breadcrumb{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<aside id="sidebar">
+  <div id="sidebar-header">
+    <div id="logo">Py</div>
+    <div id="logo-text">PyOOP</div>
+    <button id="toggle-btn" title="Toggle sidebar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+  </div>
+  <div id="progress-bar-wrap">
+    <div id="progress-label"><span>Progress</span><span id="prog-pct">0%</span></div>
+    <div id="progress-track"><div id="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div id="chapter-list"></div>
+</aside>
+
+<main id="main">
+  <div id="topbar">
+    <div id="ch-breadcrumb">Python OOP &rsaquo; <span id="bc-title">—</span></div>
+    <div class="tab-btns">
+      <button class="tab-btn active" data-tab="lesson">Lesson</button>
+      <button class="tab-btn" data-tab="quiz">Quiz</button>
+    </div>
+    <button id="mark-done-btn">✓ Mark done</button>
+  </div>
+  <div id="content"></div>
+</main>
+
+</div>
+
+<button id="ai-btn" title="Ask Claude">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+</button>
+<div id="ai-panel">
+  <div id="ai-panel-header">
+    <div class="ai-dot"></div>
+    <span>Ask Claude about this chapter</span>
+  </div>
+  <div id="ai-messages">
+    <div class="ai-msg bot">Hi! I'm here to explain any concept in this chapter. What would you like to understand better?</div>
+  </div>
+  <div id="ai-input-row">
+    <input id="ai-input" type="text" placeholder="Ask anything…" />
+    <button id="ai-send">Send</button>
+  </div>
+</div>
+
+<script>
+const CHAPTERS = [
+  {section:"Foundations",id:"oop-intro",title:"OOP Introduction",level:"beginner",
+    desc:"Understand the core ideas behind Object-Oriented Programming — why it exists and how it structures large programs.",
+    concepts:[
+      {t:"Classes & Objects",d:"A class is a blueprint; objects are instances built from it."},
+      {t:"Encapsulation",d:"Bundling data and methods together inside a class."},
+      {t:"Abstraction",d:"Hiding complexity by exposing only what's necessary."},
+      {t:"Inheritance",d:"Child classes inherit attributes and methods from parent classes."},
+    ],
+    code:`<span class="cm"># A simple class definition</span>
+<span class="kw">class</span> <span class="cl">Dog</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, name, breed):
+        <span class="punc">self</span>.name <span class="punc">=</span> name
+        <span class="punc">self</span>.breed <span class="punc">=</span> breed
+
+    <span class="kw">def</span> <span class="fn">bark</span>(<span class="punc">self</span>):
+        <span class="kw">return</span> <span class="str">f"<span class="punc">{self.name}</span> says: Woof!"</span>
+
+<span class="cm"># Creating an instance (object)</span>
+rex <span class="punc">=</span> <span class="cl">Dog</span>(<span class="str">"Rex"</span>, <span class="str">"Labrador"</span>)
+<span class="fn">print</span>(rex.bark())  <span class="cm"># Rex says: Woof!</span>`,
+    quiz:[
+      {q:"What is a class in Python?",opts:["A function that returns values","A blueprint for creating objects","A built-in Python module","A type of loop"],ans:1,exp:"A class is a template/blueprint that defines attributes and methods. Objects (instances) are created from classes."},
+      {q:"Which method is called automatically when an object is created?",opts:["__start__","__create__","__init__","__new_obj__"],ans:2,exp:"__init__ is the constructor — it runs automatically when you do MyClass() and sets up initial state."},
+      {q:"What does 'self' refer to inside a class method?",opts:["The class itself","The parent class","The current instance of the class","A global variable"],ans:2,exp:"'self' refers to the current object/instance that the method is being called on."},
+    ]
+  },
+  {section:"Foundations",id:"class-vars",title:"Class Variables",level:"beginner",
+    desc:"Learn the difference between class variables (shared by all instances) and instance variables (unique per object).",
+    concepts:[
+      {t:"Class Variable",d:"Shared across all instances. Defined directly in the class body."},
+      {t:"Instance Variable",d:"Unique to each object. Set via self in __init__."},
+      {t:"Accessing Both",d:"Use ClassName.var for class vars, self.var for instance vars."},
+      {t:"Shadowing",d:"Setting self.var when a class var exists creates a new instance var."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">Counter</span>:
+    count <span class="punc">=</span> <span class="num">0</span>  <span class="cm"># class variable — shared</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, name):
+        <span class="punc">self</span>.name <span class="punc">=</span> name  <span class="cm"># instance variable</span>
+        <span class="cl">Counter</span>.count <span class="punc">+=</span> <span class="num">1</span>
+
+a <span class="punc">=</span> <span class="cl">Counter</span>(<span class="str">"a"</span>)
+b <span class="punc">=</span> <span class="cl">Counter</span>(<span class="str">"b"</span>)
+<span class="fn">print</span>(<span class="cl">Counter</span>.count)  <span class="cm"># 2</span>`,
+    quiz:[
+      {q:"Where are class variables defined?",opts:["Inside __init__","Inside methods using self","Directly in the class body, outside methods","In a separate config file"],ans:2,exp:"Class variables are defined at the class level, outside of any method, and are shared by all instances."},
+      {q:"How do you access a class variable?",opts:["self.__class__","ClassName.variable","class.variable","@classvar"],ans:1,exp:"You access class variables with ClassName.variable_name (or instance.variable_name, but ClassName is clearer)."},
+    ]
+  },
+  {section:"Foundations",id:"instance-methods",title:"Instance Methods",level:"beginner",
+    desc:"Instance methods are the primary way objects interact with their own data. Learn how they work and how 'self' flows through them.",
+    concepts:[
+      {t:"Defining Methods",d:"Functions inside a class that always take self as the first parameter."},
+      {t:"Calling Methods",d:"obj.method() — Python auto-passes the instance as self."},
+      {t:"Accessing Attributes",d:"Inside a method, use self.attribute to read/write instance data."},
+      {t:"Returning Values",d:"Methods can compute and return values just like regular functions."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">BankAccount</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, owner, balance<span class="punc">=</span><span class="num">0</span>):
+        <span class="punc">self</span>.owner <span class="punc">=</span> owner
+        <span class="punc">self</span>.balance <span class="punc">=</span> balance
+
+    <span class="kw">def</span> <span class="fn">deposit</span>(<span class="punc">self</span>, amount):
+        <span class="punc">self</span>.balance <span class="punc">+=</span> amount
+        <span class="kw">return</span> <span class="str">f"Deposited {amount}. New balance: {self.balance}"</span>
+
+    <span class="kw">def</span> <span class="fn">withdraw</span>(<span class="punc">self</span>, amount):
+        <span class="kw">if</span> amount <span class="punc">></span> <span class="punc">self</span>.balance:
+            <span class="kw">return</span> <span class="str">"Insufficient funds"</span>
+        <span class="punc">self</span>.balance <span class="punc">-=</span> amount
+        <span class="kw">return</span> <span class="str">f"Withdrew {amount}"</span>
+
+acc <span class="punc">=</span> <span class="cl">BankAccount</span>(<span class="str">"Alice"</span>, <span class="num">1000</span>)
+<span class="fn">print</span>(acc.deposit(<span class="num">500</span>))`,
+    quiz:[
+      {q:"What is the first parameter of every instance method?",opts:["cls","this","self","instance"],ans:2,exp:"By convention, the first parameter is 'self', which Python automatically passes as the calling instance."},
+      {q:"What happens when you call obj.method(42)?",opts:["Python calls method(42)","Python calls method(obj, 42)","Python calls method(self=obj, 42)","Python raises an error"],ans:1,exp:"Python translates obj.method(42) into ClassName.method(obj, 42) — self is auto-supplied."},
+    ]
+  },
+  {section:"Foundations",id:"dunder",title:"__str__ and __repr__",level:"beginner",
+    desc:"Control how your objects are displayed in print() and in the Python REPL using special dunder methods.",
+    concepts:[
+      {t:"__str__",d:"Used by print() and str(). Should return a human-readable string."},
+      {t:"__repr__",d:"Used in the REPL and repr(). Should return a developer-friendly, unambiguous string."},
+      {t:"Fallback",d:"If __str__ is missing, Python falls back to __repr__."},
+      {t:"Best Practice",d:"__repr__ should ideally return a string that can recreate the object."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">Point</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, x, y):
+        <span class="punc">self</span>.x, <span class="punc">self</span>.y <span class="punc">=</span> x, y
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="punc">self</span>):
+        <span class="kw">return</span> <span class="str">f"Point({self.x}, {self.y})"</span>
+
+    <span class="kw">def</span> <span class="fn">__repr__</span>(<span class="punc">self</span>):
+        <span class="kw">return</span> <span class="str">f"Point(x={self.x!r}, y={self.y!r})"</span>
+
+p <span class="punc">=</span> <span class="cl">Point</span>(<span class="num">3</span>, <span class="num">4</span>)
+<span class="fn">print</span>(p)        <span class="cm"># Point(3, 4)</span>
+<span class="fn">print</span>(<span class="fn">repr</span>(p)) <span class="cm"># Point(x=3, y=4)</span>`,
+    quiz:[
+      {q:"Which dunder method does print() call first?",opts:["__repr__","__display__","__str__","__format__"],ans:2,exp:"print() calls __str__ first. If not defined, it falls back to __repr__."},
+    ]
+  },
+  {section:"Properties & Encapsulation",id:"properties",title:"Properties",level:"intermediate",
+    desc:"Use @property to create managed attributes that look like simple variables but run logic behind the scenes.",
+    concepts:[
+      {t:"@property",d:"Turns a method into a read-only attribute accessor."},
+      {t:"@x.setter",d:"Allows setting the property with validation logic."},
+      {t:"@x.deleter",d:"Runs code when the attribute is deleted."},
+      {t:"Why Properties?",d:"Keep the public interface simple while adding validation/computation internally."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">Temperature</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, celsius<span class="punc">=</span><span class="num">0</span>):
+        <span class="punc">self</span>._celsius <span class="punc">=</span> celsius
+
+    <span class="kw">@property</span>
+    <span class="kw">def</span> <span class="fn">celsius</span>(<span class="punc">self</span>):
+        <span class="kw">return</span> <span class="punc">self</span>._celsius
+
+    <span class="kw">@celsius.setter</span>
+    <span class="kw">def</span> <span class="fn">celsius</span>(<span class="punc">self</span>, value):
+        <span class="kw">if</span> value <span class="punc">&lt;</span> <span class="punc">-</span><span class="num">273.15</span>:
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="str">"Below absolute zero!"</span>)
+        <span class="punc">self</span>._celsius <span class="punc">=</span> value
+
+    <span class="kw">@property</span>
+    <span class="kw">def</span> <span class="fn">fahrenheit</span>(<span class="punc">self</span>):
+        <span class="kw">return</span> <span class="punc">self</span>._celsius <span class="punc">*</span> <span class="num">9</span><span class="punc">/</span><span class="num">5</span> <span class="punc">+</span> <span class="num">32</span>
+
+t <span class="punc">=</span> <span class="cl">Temperature</span>(<span class="num">100</span>)
+<span class="fn">print</span>(t.fahrenheit)  <span class="cm"># 212.0</span>`,
+    quiz:[
+      {q:"What decorator creates a read-only property?",opts:["@staticmethod","@classmethod","@property","@readonly"],ans:2,exp:"@property turns a method into a getter. Without a setter, it's read-only."},
+      {q:"What naming convention is used for the backing attribute?",opts:["__name","_name","name_","private_name"],ans:1,exp:"Single underscore prefix (e.g. _celsius) signals 'private by convention' — not enforced, but respected."},
+    ]
+  },
+  {section:"Properties & Encapsulation",id:"private-attrs",title:"Private Attributes",level:"intermediate",
+    desc:"Explore Python's name-mangling mechanism with double underscores and how to protect internal state.",
+    concepts:[
+      {t:"_single",d:"Convention: 'private', don't touch from outside — but not enforced."},
+      {t:"__double",d:"Name mangling: becomes _ClassName__attr. Harder to access accidentally."},
+      {t:"No True Private",d:"Python trusts developers. Name mangling prevents accidents, not malice."},
+      {t:"Getter / Setter Pattern",d:"Use methods or @property to expose controlled access."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">Wallet</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, amount):
+        <span class="punc">self</span>.__balance <span class="punc">=</span> amount  <span class="cm"># mangled to _Wallet__balance</span>
+
+    <span class="kw">def</span> <span class="fn">get_balance</span>(<span class="punc">self</span>):
+        <span class="kw">return</span> <span class="punc">self</span>.__balance
+
+    <span class="kw">def</span> <span class="fn">add_funds</span>(<span class="punc">self</span>, amount):
+        <span class="kw">if</span> amount <span class="punc">></span> <span class="num">0</span>:
+            <span class="punc">self</span>.__balance <span class="punc">+=</span> amount
+
+w <span class="punc">=</span> <span class="cl">Wallet</span>(<span class="num">100</span>)
+<span class="cm"># w.__balance → AttributeError</span>
+<span class="cm"># w._Wallet__balance → 100 (accessible but ugly)</span>`,
+    quiz:[
+      {q:"What does Python do to __attr inside a class?",opts:["Makes it truly private","Encrypts it","Renames it to _ClassName__attr","Deletes it on access"],ans:2,exp:"Name mangling renames __attr to _ClassName__attr to prevent accidental override in subclasses."},
+    ]
+  },
+  {section:"Properties & Encapsulation",id:"class-methods",title:"Class & Static Methods",level:"intermediate",
+    desc:"Go beyond instance methods — learn when and how to use @classmethod and @staticmethod for factory patterns and utility functions.",
+    concepts:[
+      {t:"@classmethod",d:"Receives the class (cls) as the first arg. Used for factory methods and alternative constructors."},
+      {t:"@staticmethod",d:"No implicit first arg. Just a regular function namespaced inside the class."},
+      {t:"Factory Pattern",d:"@classmethod lets you create objects in different ways without multiple __init__ signatures."},
+      {t:"When to use each",d:"@classmethod when you need the class; @staticmethod for pure utilities related to the class."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">Date</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, y, m, d):
+        <span class="punc">self</span>.y, <span class="punc">self</span>.m, <span class="punc">self</span>.d <span class="punc">=</span> y, m, d
+
+    <span class="kw">@classmethod</span>
+    <span class="kw">def</span> <span class="fn">from_string</span>(<span class="punc">cls</span>, s):
+        y, m, d <span class="punc">=</span> <span class="fn">map</span>(<span class="fn">int</span>, s.split(<span class="str">"-"</span>))
+        <span class="kw">return</span> <span class="punc">cls</span>(y, m, d)
+
+    <span class="kw">@staticmethod</span>
+    <span class="kw">def</span> <span class="fn">is_leap</span>(year):
+        <span class="kw">return</span> year <span class="punc">%</span> <span class="num">4</span> <span class="punc">==</span> <span class="num">0</span> <span class="kw">and</span> (year <span class="punc">%</span> <span class="num">100</span> <span class="punc">!=</span> <span class="num">0</span> <span class="kw">or</span> year <span class="punc">%</span> <span class="num">400</span> <span class="punc">==</span> <span class="num">0</span>)
+
+d <span class="punc">=</span> <span class="cl">Date</span>.from_string(<span class="str">"2024-03-15"</span>)
+<span class="fn">print</span>(<span class="cl">Date</span>.is_leap(<span class="num">2024</span>))  <span class="cm"># True</span>`,
+    quiz:[
+      {q:"What is the first argument of a @classmethod?",opts:["self","this","cls","klass"],ans:2,exp:"By convention, @classmethod uses 'cls' as the first argument, which receives the class itself (not an instance)."},
+      {q:"When is @staticmethod the right choice?",opts:["When you need to access instance data","When you need to access class data","When the function is related to the class but needs no class or instance","When creating new instances"],ans:2,exp:"Use @staticmethod for utility functions that logically belong to the class but don't need cls or self."},
+    ]
+  },
+  {section:"Inheritance",id:"inheritance",title:"Inheritance",level:"intermediate",
+    desc:"Build class hierarchies where child classes inherit and extend the behaviour of parent classes.",
+    concepts:[
+      {t:"Syntax",d:"class Child(Parent): — child inherits all parent methods and attributes."},
+      {t:"super()",d:"Calls the parent class's method, commonly used in __init__."},
+      {t:"Method Override",d:"Redefine a parent method in the child to change its behaviour."},
+      {t:"isinstance()",d:"Check if an object is an instance of a class or its parents."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">Animal</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, name):
+        <span class="punc">self</span>.name <span class="punc">=</span> name
+
+    <span class="kw">def</span> <span class="fn">speak</span>(<span class="punc">self</span>):
+        <span class="kw">raise</span> <span class="cl">NotImplementedError</span>
+
+<span class="kw">class</span> <span class="cl">Cat</span>(<span class="cl">Animal</span>):
+    <span class="kw">def</span> <span class="fn">speak</span>(<span class="punc">self</span>):
+        <span class="kw">return</span> <span class="str">f"{self.name} says Meow!"</span>
+
+<span class="kw">class</span> <span class="cl">Dog</span>(<span class="cl">Animal</span>):
+    <span class="kw">def</span> <span class="fn">speak</span>(<span class="punc">self</span>):
+        <span class="kw">return</span> <span class="str">f"{self.name} says Woof!"</span>
+
+animals <span class="punc">=</span> [<span class="cl">Cat</span>(<span class="str">"Kitty"</span>), <span class="cl">Dog</span>(<span class="str">"Rex"</span>)]
+<span class="kw">for</span> a <span class="kw">in</span> animals:
+    <span class="fn">print</span>(a.speak())`,
+    quiz:[
+      {q:"What does super().__init__() do?",opts:["Creates a new parent object","Calls the parent class's __init__ method","Deletes the child instance","Returns the parent class"],ans:1,exp:"super().__init__() calls the parent's constructor so it can set up its own attributes before the child adds its own."},
+      {q:"What does isinstance(obj, ParentClass) return for a child object?",opts:["False","True","None","Raises TypeError"],ans:1,exp:"isinstance() returns True if obj is an instance of the class OR any of its parent classes."},
+    ]
+  },
+  {section:"Inheritance",id:"method-resolution",title:"Method Resolution Order",level:"intermediate",
+    desc:"Understand how Python decides which method to call in complex inheritance hierarchies using C3 linearization.",
+    concepts:[
+      {t:"MRO",d:"The order Python searches classes when resolving method calls."},
+      {t:"C3 Linearization",d:"Algorithm Python uses to compute a consistent MRO."},
+      {t:"__mro__",d:"View the MRO of any class with ClassName.__mro__ or ClassName.mro()."},
+      {t:"Diamond Problem",d:"Multiple inheritance where two parents share a common ancestor."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">A</span>:
+    <span class="kw">def</span> <span class="fn">hello</span>(<span class="punc">self</span>): <span class="kw">return</span> <span class="str">"A"</span>
+
+<span class="kw">class</span> <span class="cl">B</span>(<span class="cl">A</span>):
+    <span class="kw">def</span> <span class="fn">hello</span>(<span class="punc">self</span>): <span class="kw">return</span> <span class="str">"B"</span>
+
+<span class="kw">class</span> <span class="cl">C</span>(<span class="cl">A</span>):
+    <span class="kw">def</span> <span class="fn">hello</span>(<span class="punc">self</span>): <span class="kw">return</span> <span class="str">"C"</span>
+
+<span class="kw">class</span> <span class="cl">D</span>(<span class="cl">B</span>, <span class="cl">C</span>):  <span class="cm"># Diamond</span>
+    <span class="kw">pass</span>
+
+<span class="fn">print</span>(<span class="cl">D</span>().hello())      <span class="cm"># "B" — left-to-right</span>
+<span class="fn">print</span>(<span class="cl">D</span>.__mro__)        <span class="cm"># (D, B, C, A, object)</span>`,
+    quiz:[
+      {q:"How does Python search for a method in class D(B, C)?",opts:["D → A → B → C","D → C → B → A","D → B → C → A","Random order"],ans:2,exp:"Python uses C3 linearization: left-to-right depth first, but A (shared base) is deferred until all children are checked."},
+    ]
+  },
+  {section:"Inheritance",id:"abstract-classes",title:"Abstract Classes",level:"intermediate",
+    desc:"Use the abc module to define interfaces — classes that cannot be instantiated and enforce method implementation in subclasses.",
+    concepts:[
+      {t:"ABC",d:"Abstract Base Class — a class you can't instantiate directly."},
+      {t:"@abstractmethod",d:"Forces subclasses to implement the marked method."},
+      {t:"Interface Pattern",d:"Define a contract: all subclasses must implement these methods."},
+      {t:"ABC vs Protocol",d:"ABCs use inheritance; Protocols use structural subtyping."},
+    ],
+    code:`<span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+
+<span class="kw">class</span> <span class="cl">Shape</span>(<span class="cl">ABC</span>):
+    <span class="kw">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">area</span>(<span class="punc">self</span>) <span class="punc">-&gt;</span> <span class="fn">float</span>: ...
+
+    <span class="kw">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">perimeter</span>(<span class="punc">self</span>) <span class="punc">-&gt;</span> <span class="fn">float</span>: ...
+
+<span class="kw">class</span> <span class="cl">Circle</span>(<span class="cl">Shape</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, r): <span class="punc">self</span>.r <span class="punc">=</span> r
+    <span class="kw">def</span> <span class="fn">area</span>(<span class="punc">self</span>): <span class="kw">return</span> <span class="num">3.14159</span> <span class="punc">*</span> <span class="punc">self</span>.r<span class="punc">**</span><span class="num">2</span>
+    <span class="kw">def</span> <span class="fn">perimeter</span>(<span class="punc">self</span>): <span class="kw">return</span> <span class="num">2</span> <span class="punc">*</span> <span class="num">3.14159</span> <span class="punc">*</span> <span class="punc">self</span>.r
+
+<span class="cm"># Shape() → TypeError: Can't instantiate abstract class</span>`,
+    quiz:[
+      {q:"What happens if a subclass doesn't implement an @abstractmethod?",opts:["It inherits None","Python raises TypeError on instantiation","It silently returns None","Python auto-implements it"],ans:1,exp:"Python raises TypeError when you try to instantiate a subclass that hasn't implemented all abstract methods."},
+    ]
+  },
+  {section:"Special Methods",id:"operator-overload",title:"Operator Overloading",level:"intermediate",
+    desc:"Define custom behaviour for Python operators (+, -, *, ==, <, etc.) using dunder methods.",
+    concepts:[
+      {t:"__add__",d:"Called when + is used on objects of your class."},
+      {t:"__eq__ / __lt__",d:"Enable equality (==) and comparison (<, >, <=, >=) operators."},
+      {t:"__len__",d:"Makes len(obj) work on your class."},
+      {t:"@functools.total_ordering",d:"Implement __eq__ + one comparison and get the rest free."},
+    ],
+    code:`<span class="kw">from</span> functools <span class="kw">import</span> total_ordering
+
+<span class="kw">@total_ordering</span>
+<span class="kw">class</span> <span class="cl">Vector</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, x, y): <span class="punc">self</span>.x, <span class="punc">self</span>.y <span class="punc">=</span> x, y
+    <span class="kw">def</span> <span class="fn">__add__</span>(<span class="punc">self</span>, o): <span class="kw">return</span> <span class="cl">Vector</span>(<span class="punc">self</span>.x<span class="punc">+</span>o.x, <span class="punc">self</span>.y<span class="punc">+</span>o.y)
+    <span class="kw">def</span> <span class="fn">__eq__</span>(<span class="punc">self</span>, o): <span class="kw">return</span> (<span class="punc">self</span>.x, <span class="punc">self</span>.y) <span class="punc">==</span> (o.x, o.y)
+    <span class="kw">def</span> <span class="fn">__lt__</span>(<span class="punc">self</span>, o):
+        <span class="kw">return</span> (<span class="punc">self</span>.x<span class="punc">**</span><span class="num">2</span><span class="punc">+</span><span class="punc">self</span>.y<span class="punc">**</span><span class="num">2</span>) <span class="punc">&lt;</span> (o.x<span class="punc">**</span><span class="num">2</span><span class="punc">+</span>o.y<span class="punc">**</span><span class="num">2</span>)
+    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="punc">self</span>): <span class="kw">return</span> <span class="str">f"Vector({self.x}, {self.y})"</span>
+
+v1 <span class="punc">=</span> <span class="cl">Vector</span>(<span class="num">1</span>,<span class="num">2</span>); v2 <span class="punc">=</span> <span class="cl">Vector</span>(<span class="num">3</span>,<span class="num">4</span>)
+<span class="fn">print</span>(v1 <span class="punc">+</span> v2)  <span class="cm"># Vector(4, 6)</span>`,
+    quiz:[
+      {q:"Which dunder method is called when you use '==' between two objects?",opts:["__compare__","__equals__","__eq__","__same__"],ans:2,exp:"Python calls __eq__ for the == operator. By default it compares identity (is), but you can override it."},
+    ]
+  },
+  {section:"Special Methods",id:"iterable",title:"Iterators & Iterables",level:"intermediate",
+    desc:"Make your own classes work with for loops and Python's iteration protocol using __iter__ and __next__.",
+    concepts:[
+      {t:"__iter__",d:"Returns the iterator object (usually self)."},
+      {t:"__next__",d:"Returns the next value. Raises StopIteration when done."},
+      {t:"Iterable vs Iterator",d:"Iterable has __iter__. Iterator has both __iter__ and __next__."},
+      {t:"Generator shortcut",d:"Use yield inside a method to create a generator iterator easily."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">Countdown</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>, start):
+        <span class="punc">self</span>.current <span class="punc">=</span> start
+
+    <span class="kw">def</span> <span class="fn">__iter__</span>(<span class="punc">self</span>):
+        <span class="kw">return</span> <span class="punc">self</span>
+
+    <span class="kw">def</span> <span class="fn">__next__</span>(<span class="punc">self</span>):
+        <span class="kw">if</span> <span class="punc">self</span>.current <span class="punc">&lt;=</span> <span class="num">0</span>:
+            <span class="kw">raise</span> <span class="cl">StopIteration</span>
+        val <span class="punc">=</span> <span class="punc">self</span>.current
+        <span class="punc">self</span>.current <span class="punc">-=</span> <span class="num">1</span>
+        <span class="kw">return</span> val
+
+<span class="kw">for</span> n <span class="kw">in</span> <span class="cl">Countdown</span>(<span class="num">5</span>):
+    <span class="fn">print</span>(n)  <span class="cm"># 5 4 3 2 1</span>`,
+    quiz:[
+      {q:"What exception signals the end of iteration?",opts:["IndexError","EndOfIteration","StopIteration","IterationComplete"],ans:2,exp:"StopIteration is raised by __next__ to tell the for loop that there are no more items to yield."},
+      {q:"What must __iter__ return?",opts:["A list","The next value","The iterator object","None"],ans:2,exp:"__iter__ must return an iterator object — an object with a __next__ method. Usually it returns self."},
+    ]
+  },
+  {section:"Advanced Patterns",id:"descriptors",title:"Descriptors",level:"advanced",
+    desc:"Master Python's descriptor protocol — the machinery that powers properties, classmethods, and staticmethods.",
+    concepts:[
+      {t:"Descriptor Protocol",d:"Implement __get__, __set__, __delete__ to create reusable attribute managers."},
+      {t:"Data Descriptor",d:"Implements __set__ or __delete__. Takes priority over instance __dict__."},
+      {t:"Non-data Descriptor",d:"Only implements __get__. Instance __dict__ can shadow it."},
+      {t:"Use Cases",d:"Validation, lazy computation, ORM fields, type checking."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">Validator</span>:
+    <span class="kw">def</span> <span class="fn">__set_name__</span>(<span class="punc">self</span>, owner, name):
+        <span class="punc">self</span>.name <span class="punc">=</span> name
+
+    <span class="kw">def</span> <span class="fn">__get__</span>(<span class="punc">self</span>, obj, objtype<span class="punc">=</span><span class="kw">None</span>):
+        <span class="kw">if</span> obj <span class="kw">is</span> <span class="kw">None</span>: <span class="kw">return</span> <span class="punc">self</span>
+        <span class="kw">return</span> obj.__dict__.get(<span class="punc">self</span>.name)
+
+    <span class="kw">def</span> <span class="fn">__set__</span>(<span class="punc">self</span>, obj, value):
+        <span class="kw">if not</span> <span class="fn">isinstance</span>(value, <span class="fn">int</span>):
+            <span class="kw">raise</span> <span class="cl">TypeError</span>(<span class="str">f"{self.name} must be an int"</span>)
+        obj.__dict__[<span class="punc">self</span>.name] <span class="punc">=</span> value
+
+<span class="kw">class</span> <span class="cl">Person</span>:
+    age <span class="punc">=</span> <span class="cl">Validator</span>()
+
+p <span class="punc">=</span> <span class="cl">Person</span>()
+p.age <span class="punc">=</span> <span class="num">25</span>     <span class="cm"># OK</span>
+p.age <span class="punc">=</span> <span class="str">"old"</span> <span class="cm"># TypeError</span>`,
+    quiz:[
+      {q:"What makes a descriptor a 'data descriptor'?",opts:["It stores data persistently","It implements __set__ or __delete__","It uses @dataclass","It has a __data__ attribute"],ans:1,exp:"A data descriptor implements __set__ and/or __delete__. This gives it priority over the instance's __dict__."},
+    ]
+  },
+  {section:"Advanced Patterns",id:"metaclasses",title:"Metaclasses",level:"advanced",
+    desc:"Go deep: metaclasses are classes of classes. They let you intercept and modify class creation itself.",
+    concepts:[
+      {t:"type()",d:"The default metaclass. Every class is an instance of type."},
+      {t:"Custom Metaclass",d:"Subclass type, override __new__ or __init__ to customize class creation."},
+      {t:"__new__ vs __init__",d:"__new__ creates the class object; __init__ initializes it."},
+      {t:"Real World Use",d:"Django ORM, SQLAlchemy, enum.Enum, dataclasses all use metaclasses."},
+    ],
+    code:`<span class="kw">class</span> <span class="cl">SingletonMeta</span>(<span class="fn">type</span>):
+    _instances <span class="punc">=</span> {}
+
+    <span class="kw">def</span> <span class="fn">__call__</span>(<span class="punc">cls</span>, <span class="punc">*</span>args, <span class="punc">**</span>kwargs):
+        <span class="kw">if</span> <span class="punc">cls</span> <span class="kw">not in</span> <span class="punc">cls</span>._instances:
+            <span class="punc">cls</span>._instances[<span class="punc">cls</span>] <span class="punc">=</span> <span class="fn">super</span>().__call__(<span class="punc">*</span>args, <span class="punc">**</span>kwargs)
+        <span class="kw">return</span> <span class="punc">cls</span>._instances[<span class="punc">cls</span>]
+
+<span class="kw">class</span> <span class="cl">Database</span>(metaclass<span class="punc">=</span><span class="cl">SingletonMeta</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="punc">self</span>):
+        <span class="punc">self</span>.connection <span class="punc">=</span> <span class="str">"Connected"</span>
+
+db1 <span class="punc">=</span> <span class="cl">Database</span>()
+db2 <span class="punc">=</span> <span class="cl">Database</span>()
+<span class="fn">print</span>(db1 <span class="kw">is</span> db2)  <span class="cm"># True — same instance</span>`,
+    quiz:[
+      {q:"What is the default metaclass in Python?",opts:["object","Meta","type","class"],ans:2,exp:"'type' is the metaclass for all classes in Python. Even 'object' is an instance of 'type'."},
+      {q:"When is the metaclass __new__ method called?",opts:["When an instance is created","When the class itself is being created","When a method is called","When the module is imported"],ans:1,exp:"Metaclass __new__ is called during class creation — when Python processes the class statement."},
+    ]
+  },
+  {section:"Advanced Patterns",id:"dataclasses",title:"Dataclasses",level:"advanced",
+    desc:"Use @dataclass to auto-generate __init__, __repr__, __eq__ and more — less boilerplate, more clarity.",
+    concepts:[
+      {t:"@dataclass",d:"Decorator that auto-generates common dunder methods from field annotations."},
+      {t:"field()",d:"Customize individual fields: defaults, factories, comparison exclusion."},
+      {t:"frozen=True",d:"Makes instances immutable — sets __hash__ and blocks __setattr__."},
+      {t:"Post-init",d:"__post_init__ runs after the generated __init__ for custom setup."},
+    ],
+    code:`<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass, field
+<span class="kw">from</span> typing <span class="kw">import</span> List
+
+<span class="kw">@dataclass</span>
+<span class="kw">class</span> <span class="cl">Student</span>:
+    name: <span class="fn">str</span>
+    grade: <span class="fn">int</span>
+    courses: <span class="cl">List</span>[<span class="fn">str</span>] <span class="punc">=</span> <span class="fn">field</span>(default_factory<span class="punc">=</span><span class="fn">list</span>)
+    _gpa: <span class="fn">float</span> <span class="punc">=</span> <span class="fn">field</span>(init<span class="punc">=</span><span class="kw">False</span>, default<span class="punc">=</span><span class="num">0.0</span>)
+
+    <span class="kw">def</span> <span class="fn">__post_init__</span>(<span class="punc">self</span>):
+        <span class="kw">if not</span> (<span class="num">1</span> <span class="punc">&lt;=</span> <span class="punc">self</span>.grade <span class="punc">&lt;=</span> <span class="num">12</span>):
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="str">"Grade must be 1-12"</span>)
+
+s <span class="punc">=</span> <span class="cl">Student</span>(<span class="str">"Alice"</span>, <span class="num">10</span>, [<span class="str">"Math"</span>, <span class="str">"Physics"</span>])
+<span class="fn">print</span>(s)  <span class="cm"># Student(name='Alice', grade=10, ...)</span>`,
+    quiz:[
+      {q:"What does frozen=True do to a dataclass?",opts:["Prevents subclassing","Makes the instance immutable","Disables __eq__","Caches the hash permanently"],ans:1,exp:"frozen=True makes the dataclass immutable — attempting to set an attribute raises FrozenInstanceError."},
+      {q:"Why use field(default_factory=list) instead of default=[]?",opts:["Lists can't be defaults","Mutable defaults are shared across instances — factory creates a new list each time","Factory is faster","It's just style preference"],ans:1,exp:"The mutable default trap: if you use default=[], all instances share the same list object. factory=list creates a fresh list per instance."},
+    ]
+  },
+];
+
+let completed = new Set(JSON.parse(localStorage.getItem('pyoop_done')||'[]'));
+let currentId = CHAPTERS[0].id;
+let currentTab = 'lesson';
+let quizState = {};
+
+function saveProgress(){localStorage.setItem('pyoop_done',JSON.stringify([...completed]))}
+
+function buildSidebar(){
+  const list = document.getElementById('chapter-list');
+  list.innerHTML='';
+  let lastSection='';
+  CHAPTERS.forEach((ch,i)=>{
+    if(ch.section!==lastSection){
+      const sl=document.createElement('div');
+      sl.className='section-label';
+      sl.textContent=ch.section;
+      list.appendChild(sl);
+      lastSection=ch.section;
+    }
+    const el=document.createElement('div');
+    el.className='ch-item'+(completed.has(ch.id)?' done':'')+(ch.id===currentId?' active':'');
+    el.dataset.id=ch.id;
+    el.innerHTML=`<div class="ch-num">${i+1}</div><div class="ch-title">${ch.title}</div>
+      ${completed.has(ch.id)?`<svg class="ch-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3ecf8e" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`:''}`;
+    el.addEventListener('click',()=>selectChapter(ch.id));
+    list.appendChild(el);
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const pct=Math.round(completed.size/CHAPTERS.length*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+}
+
+function selectChapter(id){
+  currentId=id;currentTab='lesson';
+  document.querySelectorAll('.ch-item').forEach(e=>e.classList.toggle('active',e.dataset.id===id));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='lesson'));
+  const ch=CHAPTERS.find(c=>c.id===id);
+  document.getElementById('bc-title').textContent=ch.title;
+  const btn=document.getElementById('mark-done-btn');
+  btn.textContent=completed.has(id)?'✓ Done':'✓ Mark done';
+  btn.className=completed.has(id)?'done-state':'';
+  renderLesson(ch);
+  document.getElementById('content').scrollTop=0;
+}
+
+function renderLesson(ch){
+  document.getElementById('content').innerHTML=`
+    <div class="ch-header">
+      <h1>${ch.title}</h1>
+      <p>${ch.desc}</p>
+      <div class="tag-row"><span class="tag ${ch.level}">${ch.level}</span><span class="tag beginner" style="background:#7c6cf020;color:var(--accent2);border-color:#7c6cf040">${ch.section}</span></div>
+    </div>
+    <div class="section-title">Key Concepts</div>
+    <div class="concept-cards">${ch.concepts.map(c=>`<div class="concept-card"><h3>${c.t}</h3><p>${c.d}</p></div>`).join('')}</div>
+    <div class="section-title">Code Example</div>
+    <div class="code-block">
+      <div class="code-label">python</div>
+      <pre>${ch.code}</pre>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    </div>
+    <div style="margin-top:16px;padding:14px 18px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);border-left:3px solid var(--accent)">
+      <div style="font-size:11px;font-weight:600;color:var(--accent2);margin-bottom:6px;letter-spacing:.06em">TIP</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7">Use the AI assistant (bottom right) to ask Claude to explain any part of this chapter in more depth, generate more examples, or quiz you on related concepts.</p>
+    </div>
+  `;
+}
+
+function renderQuiz(ch){
+  quizState={answers:{},submitted:false};
+  document.getElementById('content').innerHTML=`
+    <div style="margin-bottom:20px">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">${ch.title} — Quiz</h2>
+      <p style="font-size:13px;color:var(--text2)">${ch.quiz.length} question${ch.quiz.length>1?'s':''}. Select an answer then check it.</p>
+    </div>
+    <div class="quiz-wrap">
+      ${ch.quiz.map((q,qi)=>`
+        <div class="quiz-q" id="qq${qi}">
+          <h3>Q${qi+1}. ${q.q}</h3>
+          ${q.opts.map((opt,oi)=>`
+            <div class="quiz-opt" data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(${qi},${oi})">
+              <div class="opt-letter">${String.fromCharCode(65+oi)}</div>
+              <span>${opt}</span>
+            </div>
+          `).join('')}
+          <div class="quiz-feedback" id="fb${qi}"></div>
+        </div>
+      `).join('')}
+      <button class="btn-primary" onclick="submitQuiz()">Check Answers</button>
+      <div class="quiz-score" id="quiz-score"></div>
+    </div>
+  `;
+}
+
+function selectOpt(qi,oi){
+  if(quizState.submitted)return;
+  quizState.answers[qi]=oi;
+  document.querySelectorAll(`[data-qi="${qi}"]`).forEach(el=>el.classList.remove('selected'));
+  document.querySelector(`[data-qi="${qi}"][data-oi="${oi}"]`).classList.add('selected');
+}
+
+function submitQuiz(){
+  const ch=CHAPTERS.find(c=>c.id===currentId);
+  quizState.submitted=true;
+  let score=0;
+  ch.quiz.forEach((q,qi)=>{
+    const chosen=quizState.answers[qi];
+    const fb=document.getElementById('fb'+qi);
+    document.querySelectorAll(`[data-qi="${qi}"]`).forEach(el=>{
+      const oi=parseInt(el.dataset.oi);
+      if(oi===q.ans) el.classList.add('correct');
+      else if(oi===chosen) el.classList.add('wrong');
+    });
+    if(chosen===q.ans){score++;fb.className='quiz-feedback show ok';fb.textContent='✓ Correct! '+q.exp;}
+    else{fb.className='quiz-feedback show bad';fb.textContent='✗ '+(chosen===undefined?'Not answered. ':'')+'Correct answer: '+q.opts[q.ans]+'. '+q.exp;}
+  });
+  const sc=document.getElementById('quiz-score');
+  sc.style.display='block';
+  const pct=Math.round(score/ch.quiz.length*100);
+  sc.innerHTML=`<h2>${score}/${ch.quiz.length} — ${pct}%</h2>
+    <p>${pct===100?'Perfect score!':pct>=60?'Good effort! Review the explanations above.':'Keep studying — try the lesson tab again.'}</p>
+    <button class="btn-primary" onclick="resetQuiz()">Try Again</button>`;
+  if(pct===100){completed.add(currentId);saveProgress();buildSidebar();}
+}
+
+function resetQuiz(){const ch=CHAPTERS.find(c=>c.id===currentId);renderQuiz(ch);}
+
+function copyCode(btn){
+  const text=btn.closest('.code-block').querySelector('pre').textContent;
+  navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',1500)});
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    currentTab=btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));
+    const ch=CHAPTERS.find(c=>c.id===currentId);
+    if(currentTab==='lesson') renderLesson(ch);
+    else renderQuiz(ch);
+    document.getElementById('content').scrollTop=0;
+  });
+});
+
+document.getElementById('mark-done-btn').addEventListener('click',()=>{
+  if(completed.has(currentId)){completed.delete(currentId);}
+  else{completed.add(currentId);}
+  saveProgress();buildSidebar();selectChapter(currentId);
+});
+
+document.getElementById('toggle-btn').addEventListener('click',()=>{
+  const sb=document.getElementById('sidebar');
+  sb.classList.toggle('collapsed');
+  const icon=document.getElementById('toggle-btn').querySelector('svg');
+  icon.innerHTML=sb.classList.contains('collapsed')
+    ?'<path d="M9 18l6-6-6-6"/>'
+    :'<path d="M15 18l-6-6 6-6"/>';
+});
+
+document.getElementById('ai-btn').addEventListener('click',()=>{
+  document.getElementById('ai-panel').classList.toggle('open');
+});
+
+async function sendAI(){
+  const input=document.getElementById('ai-input');
+  const msg=input.value.trim();if(!msg)return;
+  input.value='';
+  const msgs=document.getElementById('ai-messages');
+  const ch=CHAPTERS.find(c=>c.id===currentId);
+  const userEl=document.createElement('div');
+  userEl.className='ai-msg user';userEl.textContent=msg;
+  msgs.appendChild(userEl);
+  const thinking=document.createElement('div');
+  thinking.className='ai-msg bot';thinking.textContent='Thinking…';
+  msgs.appendChild(thinking);
+  msgs.scrollTop=msgs.scrollHeight;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:400,
+        system:`You are a concise Python OOP tutor. The student is currently on the chapter: "${ch.title}". Answer in 2-4 sentences max. Use inline code with backticks. Be encouraging.`,
+        messages:[{role:'user',content:msg}]
+      })
+    });
+    const data=await res.json();
+    thinking.textContent=data.content?.[0]?.text||'Sorry, try again.';
+  }catch(e){thinking.textContent='Error connecting to Claude. Please try again.';}
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+document.getElementById('ai-send').addEventListener('click',sendAI);
+document.getElementById('ai-input').addEventListener('keydown',e=>{if(e.key==='Enter')sendAI();});
+
+// Service Worker for PWA offline support
+if('serviceWorker' in navigator){
+  const swCode = `
+    const CACHE = 'pyoop-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `;
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  const swURL = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swURL).catch(()=>{});
+}
+
+buildSidebar();
+selectChapter(CHAPTERS[0].id);
+</script>
+</body>
+</html>
